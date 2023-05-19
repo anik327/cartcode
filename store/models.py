@@ -43,8 +43,8 @@ class Customer(models.Model):
         max_length=1, choices=MEMBERSHIP_CHOICHES, default=MEMBERSHIP_BRONZE
     )
 
-    class Meta:
-        db_table = 'store_customers'
+    # class Meta:
+    #     db_table = 'store_customers'
 
 
 class Order(models.Model):

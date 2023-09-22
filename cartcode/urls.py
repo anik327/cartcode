@@ -18,8 +18,12 @@ from django.contrib import admin
 from django.urls import path, include
 
 
+admin.site.site_header = "CartCode Admin"
+admin.site.site_title = "CartCode"
+
 urlpatterns = [
     path("admin/", admin.site.urls),
+    path("store/", include("store.urls")),
     path("playground/", include("playground.urls")),
     path("__debug__/", include("debug_toolbar.urls")),
 ]

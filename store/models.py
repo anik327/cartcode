@@ -1,3 +1,4 @@
+from django.core.validators import MinValueValidator
 from django.db import models
 
 
@@ -9,19 +10,29 @@ class Promotion(models.Model):
 class Collection(models.Model):
     title = models.CharField(max_length=255)
     featured_product = models.ForeignKey(
-        "Product", on_delete=models.SET_NULL, null=True, related_name="+"
-    )
+        "Product", on_delete=models.SET_NULL, null=True, related_name="+", blank=True)
+
+    def __str__(self) -> str:
+        return self.title
+
+    class Meta:
+        ordering = ["title"]
 
 
 class Product(models.Model):
     title = models.CharField(max_length=255)
     slug = models.SlugField()
-    description = models.TextField()
-    unit_price = models.DecimalField(max_digits=6, decimal_places=2)
-    inventory = models.IntegerField()
+    description = models.TextField(null=True, blank=True)
+    unit_price = models.DecimalField(
+        max_digits=6, decimal_places=2, validators=[MinValueValidator(1)]
+    )
+    inventory = models.IntegerField(validators=[MinValueValidator(1)])
     last_update = models.DateTimeField(auto_now=True)
-    collection = models.ForeignKey(Collection, on_delete=models.PROTECT)
-    promotions = models.ManyToManyField(Promotion)
+    collection = models.ForeignKey(Collection, on_delete=models.PROTECT, related_name='products')
+    promotions = models.ManyToManyField(Promotion, blank=True)
+
+    def __str__(self) -> str:
+        return self.title
 
 
 class Customer(models.Model):
@@ -43,8 +54,11 @@ class Customer(models.Model):
         max_length=1, choices=MEMBERSHIP_CHOICHES, default=MEMBERSHIP_BRONZE
     )
 
-    # class Meta:
-    #     db_table = 'store_customers'
+    def __str__(self) -> str:
+        return f"{self.first_name} {self.last_name}"
+
+    class Meta:
+        ordering = ["first_name", "last_name"]
 
 
 class Order(models.Model):
